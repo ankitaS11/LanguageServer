@@ -1,0 +1,36 @@
+Metadata-Version: 2.1
+Name: lpyth
+Version: 0.0.0
+Summary: lpyth - LPython Language Server
+Home-page: https://github.com/ankitaS11/lpyth
+Author: Ankita Sharma
+Author-email: anki5486@gmail.com
+License: MIT
+Project-URL: Documentation, https://ankitaS11.github.io/lpyth
+Project-URL: Repository, https://github.com/ankitaS11/lpyth
+Project-URL: Tracker, https://github.com/ankitaS11/lpyth/issues
+Keywords: LPython,language server,language server protocol,lsp,lpyth
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Fortran
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Provides-Extra: docs
+
+UNKNOWN
+
