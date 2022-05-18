@@ -3,11 +3,9 @@
 This project is a prototype for:
 
 1. A language server written in Python which generates a sample meta data (please see the list below), and transfers it to the received jsonrpc client. The message is returned as a dictionary. The following details are expected to be returned from our linter, but for now they have been hard coded.
-  a. Starting index (character): start_index (Number)
-  
-  b. Ending index (character): end_index (Number)
-  
-  c. Hover message: hover_message (string)
+  a. Starting index (character): start_index (Number).
+  b. Ending index (character): end_index (Number).
+  c. Hover message: hover_message (string).
 
 2. The jsonrpc code is taken from fortls repository (https://github.com/gnikit/fortls/blob/master/fortls/jsonrpc.py)
 3. A sample VSCode Extension for the linter, which calls the language server when the document is saved and when the document is a python file. It then received the metadata and draws it on the active editor (if any) with a wavy underline.
