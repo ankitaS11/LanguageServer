@@ -52,10 +52,10 @@ class LPythonServer:
         start_column = 0
         end_line = 3
         end_column = 10
-        msg = "Hello"
+        msg = "msg: Hi"
         diag_results = []
         diag_results.append({
-            'source': 'pylint',
+            'source': 'source: Ankita',
             'range': {
                 'start': {
                     'line': start_line,
@@ -132,13 +132,13 @@ class LPythonServer:
 
         handler = {
             "initialize": self.serve_initialize,
-            "textDocument/didOpen": self.serve_onSave,
+            # "textDocument/didOpen": self.serve_onSave,
             "textDocument/didSave": self.serve_onSave,
             # "textDocument/didChange": self.serve_onChange,
-            "initialized": noop,
-            "$/cancelRequest": noop,
-            "$/setTrace": noop,
-            "shutdown": noop,
+            # "initialized": noop,
+            # "$/cancelRequest": noop,
+            # "$/setTrace": noop,
+            # "shutdown": noop,
             "exit": self.serve_exit,
         }.get(request["method"], self.serve_default)
 
