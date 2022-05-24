@@ -118,6 +118,8 @@ class JSONRPC2Connection:
         body = json.dumps(body, separators=(",", ":"))
         content_length = len(body)
         response = (
+            f"Content-Length: {content_length}\r\n"
+            "Content-Type: application/vscode-jsonrpc; charset=utf8\r\n\r\n"
             f"{body}"
         )
         self.conn.write(response)
@@ -149,6 +151,8 @@ class JSONRPC2Connection:
         rid = self._next_id
         self._next_id += 1
         body = {
+            "jsonrpc": "2.0",
+            "id": rid,
             "method": method,
             "params": params,
         }
