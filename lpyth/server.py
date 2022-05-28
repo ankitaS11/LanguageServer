@@ -5,7 +5,8 @@ from urllib.parse import quote, unquote
 
 from pathlib import Path
 
-from .jsonrpc import JSONRPC2Connection, ReadWriter
+from .jsonrpc import JSONRPC2Connection, ReadWriter, path_from_uri
+from .json_templates import symbol_json
 
 class DiagnosticSeverity:
     Error = 1
@@ -75,6 +76,29 @@ class LPythonServer:
             {"uri": uri, "diagnostics": diag_results},
         )
 
+    
+    def serve_document_symbols(self, request: dict):
+
+        # Get parameters from request
+        params: dict = request["params"]
+        uri: str = params["textDocument"]["uri"]
+        path: str = path_from_uri(uri)
+        
+        test_output = [
+            symbol_json(
+                "Ankita",
+                12,
+                uri,
+                0,  # start_line
+                0,  # start_character
+                10, # end_line
+                10  # end_character
+            )
+        ]
+        return test_output
+            
+
+    
     # def serve_onChange(self, request: dict):
     #     # Update workspace from file sent by editor
     #     params: dict = request["params"]
@@ -103,21 +127,6 @@ class LPythonServer:
     #                     exc_info=True,
     #                 )
     #                 return
-    #     # Parse newly updated file
-    #     # if reparse_req:
-    #     #     _, err_str = self.update_workspace_file(path, update_links=True)
-    #     #     if err_str is not None:
-    #     #         self.post_message(f"Change request failed for file '{path}': {err_str}")
-    #     #         return
-    #     #     # Update include statements linking to this file
-    #     #     for _, tmp_file in self.workspace.items():
-    #     #         tmp_file.ast.resolve_includes(self.workspace, path=path)
-    #     #     file_obj.ast.resolve_includes(self.workspace)
-    #     #     # Update inheritance (currently file only)
-    #     #     # tmp_file.ast.resolve_links(self.obj_tree, self.link_version)
-    #     # elif file_obj.preproc:
-    #     #     file_obj.preprocess(pp_defs=self.pp_defs)
-    #     #     self.pp_defs = {**self.pp_defs, **file_obj.pp_defs}
 
 
     def post_message(self, msg, severity = 3, exc_info = False):
@@ -134,13 +143,20 @@ class LPythonServer:
             "initialize": self.serve_initialize,
             # "textDocument/didOpen": self.serve_onSave,
             "textDocument/didSave": self.serve_onSave,
+            "textDocument/documentSymbol": self.serve_document_symbols,
+            # "workspace/symbol": self.serve_workspace_symbol,
             # "textDocument/didChange": self.serve_onChange,
             # "initialized": noop,
             # "$/cancelRequest": noop,
             # "$/setTrace": noop,
             # "shutdown": noop,
-            "exit": self.serve_exit,
+            # "exit": self.serve_exit,
         }.get(request["method"], self.serve_default)
+
+        # with open("/home/ankita/Documents/log.txt", "a") as _file:
+        #     _file.write("Got method: "+
+        #         str(request['method']) + "\n"
+        #     )
 
         if "id" not in request:
             try:
@@ -167,11 +183,6 @@ class LPythonServer:
         else:
             self.conn.write_response(request["id"], resp)
 
-    def serve_initialize(self, request: dict):
-        server_capabilities = {
-            "textDocumentSync": 2,
-        }
-        return {"capabilities": server_capabilities}
 
     def serve_default(self, request: dict):
         return JSONRPC2Error(
@@ -179,8 +190,16 @@ class LPythonServer:
             message="found error",
         )
 
+    def serve_initialize(self, request: dict):
+        server_capabilities = {
+            "textDocumentSync": 2,
+            "documentSymbolProvider": True,
+        }
+        return {"capabilities": server_capabilities}
+
     def serve_exit(self, request: dict) -> None:
         self.running = False
+
 
     def run(self, path: str):
         # Run server
