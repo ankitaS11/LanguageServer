@@ -1,4 +1,4 @@
-# lp_server
+# `lpyth` Language Server
 
 This repo contains an implementation of simple Langage Server Protocol (LSP) for Python.
 
