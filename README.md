@@ -14,7 +14,7 @@ All code editors (VS Code, Atom, Sublime Text, (Neo)Vim) that supports LSP can i
 
 Note: Meta data is being hardcoded.
 
-## Installation
+## Installation:
 
 ``` bash
 git clone https://github.com/ankitaS11/LanguageServer
