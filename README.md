@@ -1,10 +1,24 @@
 # lp_server
 
-Note that this now supports `LanguageClient` with VSCode Extension. :)
+This repo contains an implementation of simple Langage Server Protocol (LSP) for Python.
 
-## Build project:
+All code editors (VS Code, Atom, Sublime Text, (Neo)Vim) that supports LSP can integrate with `lpyth`.
 
-```bash
+## Features:
+  1. Draws a line when document is saved.
+  ![image](https://user-images.githubusercontent.com/68434944/170823254-8e391875-8325-45e4-95d2-58d9fd48b88b.png)
+
+  2. Symbol Lookup. 
+  ![image](https://user-images.githubusercontent.com/68434944/170823314-590190b2-842c-4bf9-8999-829458a4977f.png)
+
+
+Note: Meta data is being hardcoded.
+
+## Installation
+
+``` bash
+git clone https://github.com/ankitaS11/LanguageServer
+cd LanguageServer
 python3 setup.py develop
 ```
 
@@ -16,6 +30,3 @@ pip uninstall lpyth
 rm -rf build dist
 ```
 
-## Usage:
-
-~Go to any other folder except this, and do: `lpyth <file_path>`~ (this will no longer work, it only expects request from the VSCode extension)
