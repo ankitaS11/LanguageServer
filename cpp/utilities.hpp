@@ -13,9 +13,6 @@ class Logger {
     public:
         Logger() {
             this->file_name = "/home/ankita/Documents/git/logs.log";
-
-            // std::FILE* file = std::fopen("/home/krshrimali/logs.log", "a");
-            // this->file = file;
         }
 
         void log(std::string message) {
