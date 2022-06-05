@@ -1,7 +1,7 @@
 import os
 import sys
 import traceback
-from urllib.parse import quote, unquote
+from urllib.parse import unquote
 
 from pathlib import Path
 
@@ -83,7 +83,10 @@ class LPythonServer:
         params: dict = request["params"]
         uri: str = params["textDocument"]["uri"]
         path: str = path_from_uri(uri)
-        
+        with open("/home/ankita/Documents/log.txt", "a") as _file:
+            _file.write("Data types: "+
+                str(request) + " " + str(type(request)) + "\n"
+            )
         test_output = [
             symbol_json(
                 "Ankita",
@@ -152,11 +155,6 @@ class LPythonServer:
             # "shutdown": noop,
             # "exit": self.serve_exit,
         }.get(request["method"], self.serve_default)
-
-        # with open("/home/ankita/Documents/log.txt", "a") as _file:
-        #     _file.write("Got method: "+
-        #         str(request['method']) + "\n"
-        #     )
 
         if "id" not in request:
             try:

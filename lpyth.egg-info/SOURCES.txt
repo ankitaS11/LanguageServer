@@ -1,0 +1,13 @@
+README.md
+setup.cfg
+setup.py
+lpyth/__init__.py
+lpyth/json_templates.py
+lpyth/jsonrpc.py
+lpyth/server.py
+lpyth.egg-info/PKG-INFO
+lpyth.egg-info/SOURCES.txt
+lpyth.egg-info/dependency_links.txt
+lpyth.egg-info/entry_points.txt
+lpyth.egg-info/requires.txt
+lpyth.egg-info/top_level.txt
