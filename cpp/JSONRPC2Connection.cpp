@@ -64,14 +64,14 @@ std::string JSONRPC2Connection::read() {
   return json;
 }
 
-auto JSONRPC2Connection::_json_parse(std::string body) {
+json JSONRPC2Connection::_json_parse(std::string body) {
   auto json_body = json::parse(body); 
   auto str = json_body["jsonrpc"].get<std::string>();
   this->log.log("json:" + str);
   return json_body;
 }
 
-auto JSONRPC2Connection::_receive() {
+json JSONRPC2Connection::_receive() {
   std::string line;
   std::getline(std::cin, line);
   this->log.log("Got line: " + line);
@@ -94,11 +94,10 @@ auto JSONRPC2Connection::_receive() {
   this->log.log("Reading body...\n");
   std::string body = this->read();
   // this->log.log("Got body: " + body);
-  _json_parse(body);
-  return body;
+  return _json_parse(body);
 }
 
-std::string JSONRPC2Connection::read_message() {
+json JSONRPC2Connection::read_message() {
   // if want is None is true 
   this->log.log("LOG READING MESSAGE...\n");
   // if (this->_msg_buffer.size() != 0) {
@@ -108,7 +107,7 @@ std::string JSONRPC2Connection::read_message() {
   //   this->log.log("We received output: " + output);
   //   return output;
   // }
-  std::string res = "";
+  json res;
   try {
     // this->log.log("Now receiving...\n");
     res = this->_receive();

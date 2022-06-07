@@ -3,7 +3,10 @@
 
 #include <string>
 #include "JSONRPC2Connection.hpp"
+#include "nlohmann/json.hpp"
 #include "utilities.hpp"
+
+using json = nlohmann::json;
 
 class LPythonServer {
     private:
@@ -19,7 +22,7 @@ class LPythonServer {
 
         void run(std::string);
 
-        void handle(auto);
+        void handle(json);
 };
 
 #endif

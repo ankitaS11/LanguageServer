@@ -3,41 +3,68 @@
 #include "JSONRPC2Connection.hpp"
 #include "nlohmann/json.hpp"
 
+using json = nlohmann::json;
+
 #include <map>
 #include <string>
 
 struct handle_functions
 {  
-   Logger log;
-   handle_functions() {
-     this->log = Logger();
-   }
-   void serve_initialize() { this->log.log("Initialized called"); }
-   void serve_onSave() { this->log.log("OnSave called"); }
+  Logger log;
+  handle_functions() {
+    this->log = Logger();
+  }
+  json serve_initialize(json request) {
+    this->log.log("serve_initialized() called");
+    json server_capabilities = {
+      {"textDocumentSync", 2},
+      {"documentSymbolProvider", true}
+    };
+    return {{"capabilities",server_capabilities}};
+  }
+  void serve_onSave() {
+     this->log.log("serve_OnSave() called"); 
+  }
+  // json serve_default() { this->log.log("serveDefault called");}
 };
 
-typedef void (handle_functions::*handle)(void);
-typedef std::map<std::string, handle> map_fun;
+typedef json (handle_functions::*json_handle)(json);
+typedef void (handle_functions::*void_handle)(void);
 
-void LPythonServer::handle(auto request) {
-    this->log.log("Inside handle..");
-    map_fun handler;
-    handler["initialize"] = &handle_functions::serve_initialize;
-    handler["textDocument/didSave"] = &handle_functions::serve_onSave;
+typedef std::map<std::string, json_handle> json_mapfun;
+typedef std::map<std::string, void_handle> void_mapfun;
 
-    std::string request_method = request["method"];
-    map_fun::iterator x = handler.find(request_method);
+void LPythonServer::handle(json request) {
 
-    if (x != handler.end()) {
-        handle_functions h;
-        (h.*(x->second))();
-        std::cout << "Done";
-    } 
+    json_mapfun json_handler;
+    void_mapfun void_handler;
+
+    json_handler["initialize"] = &handle_functions::serve_initialize;
+    void_handler["textDocument/didSave"] = &handle_functions::serve_onSave;
+
+    std::string request_method = request["method"].get<std::string>();
+    
+    if (request.contains("id")) {
+      json_mapfun::iterator x = json_handler.find(request_method);
+
+      if (x != json_handler.end()) {
+          handle_functions h;
+          (h.*(x->second))(request);
+      } 
+    }
+    else {
+      void_mapfun::iterator x = void_handler.find(request_method);
+
+      if (x != void_handler.end()) {
+          handle_functions h;
+          (h.*(x->second))();
+      } 
+    }
 }
 
 void LPythonServer::run(std::string path) {
   while (this->running) {
     auto request = this->conn->read_message();
-    // this->handle(request);
+    this->handle(request);
   }
 }
