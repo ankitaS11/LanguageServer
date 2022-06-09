@@ -18,9 +18,12 @@ class JSONRPC2Connection {
     }
     json read_message();
     int _read_header_content_length(std::string);
-    std::string read();
+    std::string read(int);
     json _receive();
     json _json_parse(std::string);
+    void _send(json&);
+    void write_message(int, json&);
+    void send_notification(std::string, json&);
 };
 
 #endif

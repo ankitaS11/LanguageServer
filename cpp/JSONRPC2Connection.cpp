@@ -32,7 +32,7 @@ int JSONRPC2Connection::_read_header_content_length(std::string line) {
   }
 
   if (line.substr(0, 16) == "Content-Length: ") {
-    // Content-length: 100
+    // Example -> Content-length: 100
     int length = std::stoi(line.substr(16, line.size() - 16));
     return length;
   }
@@ -40,84 +40,81 @@ int JSONRPC2Connection::_read_header_content_length(std::string line) {
   return -1;
 }
 
-std::string JSONRPC2Connection::read() {
-  // int i = 0;
-  // std::string output = "";
-  // while (i <= length) {
-  //   char c;
-  //   std::cin >> c;
-  //   output.push_back(c);
-  //   i++;
-  // }
-  // return output;
-  // Do not skip whitespace, more configuration may also be needed.
-  this->log.log("Reached reading body...");
+std::string JSONRPC2Connection::read(int len) {
   std::cin >> std::noskipws;
 
-  // Copy all data from cin, using iterators.
-  std::istream_iterator<char> begin(std::cin);
-  std::istream_iterator<char> end;
-  std::string json(begin, end);
-  this->log.log("Got json as: " + json);
-
-  // Use the JSON data somehow.
-  return json;
+  std::string body = "";
+  int exit_seq = 0;
+  for (int i = 0; i < len;) {
+    int c = getchar();
+    if (c == EOF) break;
+    if (i == 0 && c != 123) continue;
+    if (exit_seq == 0 && c == '\r') {
+      ++exit_seq;
+    } else if (exit_seq == 0 && c == '\n'){
+      break;
+    } else {
+      body += c;
+      i++;
+    }
+  }
+  this->log.log("Readed body as: " + body + '\n');
+  return body;
 }
 
 json JSONRPC2Connection::_json_parse(std::string body) {
-  auto json_body = json::parse(body); 
-  auto str = json_body["jsonrpc"].get<std::string>();
-  this->log.log("json:" + str);
+  auto json_body = json::parse(body);
   return json_body;
 }
 
 json JSONRPC2Connection::_receive() {
   std::string line;
   std::getline(std::cin, line);
-  this->log.log("Got line: " + line);
   if (line.size() == 0) {
     // EOFError
     this->log.log("Throwing EOF Error: ");
     throw(EOFError());
   }
-
-  this->log.log("Now reading length");
   int length = this->_read_header_content_length(line);
-  this->log.log("Got length as: " + std::to_string(length));
-
-  this->log.log("Getting each line till we get r and n characters\n");
-  // while (line != "\r\n") {
-  //   this->log.log("getting line: " + line);
-  //   std::getline(std::cin, line);
-  // }
-
-  this->log.log("Reading body...\n");
-  std::string body = this->read();
-  // this->log.log("Got body: " + body);
+  std::string body = this->read(length);
   return _json_parse(body);
 }
 
+void JSONRPC2Connection::_send(json& body) {
+  std::string body_str = body.dump();
+  int content_length = body_str.size();
+  std::string response = "Content-Length: " + std::to_string(content_length) + "\r\n" +
+    "Content-Type: application/vscode-jsonrpc; charset=utf8\r\n\r\n";
+  std::cout << response;
+  std::cout << body;
+}
+
+void JSONRPC2Connection::write_message(int rid, json& response) {
+  json body = {
+      {"jsonrpc", "2.0"},
+      {"id", rid},
+      {"result", response},
+  };
+  this->_send(body);
+}
+
 json JSONRPC2Connection::read_message() {
-  // if want is None is true 
-  this->log.log("LOG READING MESSAGE...\n");
-  // if (this->_msg_buffer.size() != 0) {
-  //   this->log.log("BUFFER NOT EMPTY\n");
-  //   std::string output = this->_msg_buffer.front();
-  //   this->_msg_buffer.pop_front();
-  //   this->log.log("We received output: " + output);
-  //   return output;
-  // }
-  json res;
+  json res_empty;
   try {
-    // this->log.log("Now receiving...\n");
-    res = this->_receive();
-    // this->log.log("We received output: " + res);
+    json res = this->_receive();
     return res;
   } catch (EOFError) {
-    // this->log.log("End of file...\n");
-    return res;
+    return res_empty;
   }
 
-  // this->log.log("Returning empty msg from read_message\n");
-  return res;
+  return res_empty;
+}
+
+void JSONRPC2Connection::send_notification(std::string method, json &params) {
+  json body = {
+            {"jsonrpc", "2.0"},
+            {"method", method},
+            {"params", params},
+        };
+        this->_send(body);
 }

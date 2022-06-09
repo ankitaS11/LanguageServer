@@ -12,18 +12,17 @@ class Logger {
         std::FILE* file;
     public:
         Logger() {
-            this->file_name = "/home/ankita/Documents/git/logs.log";
+            this->file_name = "/home/ankita/Documents/git/cpp_logs.log";
         }
 
         void log(std::string message) {
-            std::FILE* file = std::fopen("/home/ankita/Documents/git/logs.log", "a");
+            message += "\n";
+            std::FILE* file = std::fopen(this->file_name.c_str(), "a");
             std::fwrite(message.data(), sizeof(message[0]), message.size(), file);
             this->exit(file);
         }
 
         void exit(std::FILE* file) {
-            std::string end_line = "LOG EXITING...\n";
-            std::fwrite(end_line.data(), sizeof(end_line[0]), end_line.size(), file);
             std::fclose(file);
         }
 };
