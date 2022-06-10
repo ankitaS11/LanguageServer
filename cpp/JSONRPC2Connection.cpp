@@ -83,10 +83,11 @@ json JSONRPC2Connection::_receive() {
 void JSONRPC2Connection::_send(json& body) {
   std::string body_str = body.dump();
   int content_length = body_str.size();
+  this->log.log("body: "+ body_str);
   std::string response = "Content-Length: " + std::to_string(content_length) + "\r\n" +
     "Content-Type: application/vscode-jsonrpc; charset=utf8\r\n\r\n";
   std::cout << response;
-  std::cout << body;
+  std::cout << body_str;
 }
 
 void JSONRPC2Connection::write_message(int rid, json& response) {

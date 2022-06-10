@@ -32,21 +32,26 @@ struct handle_functions
         int end_line = 3;
         int end_column = 10;
         std::string msg = "msg: Hi";
-        json diag_results = {
-            {"source", "source: Ankita"},
-            {"range", {
-                "start", {
-                    {"line", start_line},
-                    {"character", start_column},
-                },
-                "end", {
-                    {"line", end_line},
-                    {"character", end_column},
-                },
+        json range_obj = {
+            {
+              "start", {
+                {"line", start_line},
+                {"character", start_column},
+              }
             },
+            {
+              "end", {
+                {"line", end_line},
+                {"character", end_column},
+              }
+            },
+        };
+        json diag_results = { {
+            {"source", "source: Ankita"},
+            {"range", range_obj},
             {"message", msg},
-            {"severity", 2},
-        }
+            {"severity", 2}
+          }
         };
         json message_send = {
           {"uri", uri},
@@ -58,6 +63,25 @@ struct handle_functions
           );
 
      this->log.log("serve_OnSave() called"); 
+  }
+
+  json serve_document_symbol(json request) {
+    std::string uri = request["params"]["textDocument"]["uri"];
+    json range_object = {
+      {"start", {{"line", 1}, {"character", 1}}},
+      {"end", {{"line", 10}, {"character", 10}}},
+    };
+    json location_object = {
+      {"uri", uri},
+      {"range", range_object}
+    };
+    json test_output = {{
+      {"name", "source: Ankita"},
+      {"kind", 12},
+      {"location", location_object},
+    }
+    };
+    return test_output;
   }
 };
 
@@ -72,6 +96,7 @@ void LPythonServer::handle(json request) {
     void_mapfun void_handler;
 
     json_handler["initialize"] = &handle_functions::serve_initialize;
+    json_handler["textDocument/documentSymbol"] = &handle_functions::serve_document_symbol;
     void_handler["textDocument/didSave"] = &handle_functions::serve_onSave;
 
     std::string request_method = request["method"].get<std::string>();
