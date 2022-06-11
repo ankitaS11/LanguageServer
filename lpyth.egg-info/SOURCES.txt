@@ -5,6 +5,7 @@ lpyth/__init__.py
 lpyth/json_templates.py
 lpyth/jsonrpc.py
 lpyth/server.py
+lpyth/utilities.py
 lpyth.egg-info/PKG-INFO
 lpyth.egg-info/SOURCES.txt
 lpyth.egg-info/dependency_links.txt

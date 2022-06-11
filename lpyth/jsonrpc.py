@@ -5,6 +5,8 @@ import threading
 from collections import deque
 from pathlib import Path
 from urllib.parse import quote, unquote
+from .utilities import Logger
+
 
 # from fortls.constants import log
 
@@ -68,6 +70,7 @@ class JSONRPC2Connection:
         self.conn = conn
         self._msg_buffer = deque()
         self._next_id = 1
+        self.logger = Logger()
 
     def _read_header_content_length(self, line):
         if len(line) < 2 or line[-2:] != "\r\n":
@@ -91,6 +94,8 @@ class JSONRPC2Connection:
             line = self.conn.readline()
         body = self.conn.read(length)
         # log.debug("RECV %s", body)
+        self.logger.log("_Recieve body: "+ body +"\n")
+        self.logger.log("Content-Length: "+ str(length)+"\n")
         return json.loads(body)
 
     def read_message(self, want=None):
@@ -98,6 +103,7 @@ class JSONRPC2Connection:
         id is None, the next available message is returned."""
         if want is None:
             if self._msg_buffer:
+                self.logger.log("msg_buffer - "+ self._msg_buffer.front())
                 return self._msg_buffer.popleft()
             return self._receive()
 
@@ -117,6 +123,7 @@ class JSONRPC2Connection:
     def _send(self, body):
         body = json.dumps(body, separators=(",", ":"))
         content_length = len(body)
+        self.logger.log("Body: "+ body + "\n")
         response = (
             f"Content-Length: {content_length}\r\n"
             "Content-Type: application/vscode-jsonrpc; charset=utf8\r\n\r\n"
