@@ -3,7 +3,7 @@
 Use this command to compile: (you should be in this cpp folder)
 
 ```bash
-g++ server.cpp JSONRPC2Connection.cpp -I. -o lpythcpp
+g++ JSONRPC2Connection.cpp LPythonServer.cpp main.cpp -I. -o lpythcpp\
 ```
 
 Now it will generate a binary/executable call `lpythcpp`, you can run it using:

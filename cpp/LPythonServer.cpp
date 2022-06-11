@@ -97,6 +97,7 @@ void LPythonServer::handle(json request) {
 
     json_handler["initialize"] = &handle_functions::serve_initialize;
     json_handler["textDocument/documentSymbol"] = &handle_functions::serve_document_symbol;
+    
     void_handler["textDocument/didSave"] = &handle_functions::serve_onSave;
 
     std::string request_method = request["method"].get<std::string>();
