@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 class EOFError : public std::exception {
   public:
-    std::string what () {
+    std::string message () {
       return "Reached end of file...";
     }
 };
@@ -26,6 +26,23 @@ class JSONRPC2ProtocolError : public std::exception {
     }
 };
 
+json JSONRPC2Connection::_json_parse(std::string body) {
+  auto json_body = json::parse(body);
+  return json_body;
+}
+
+json JSONRPC2Connection::read_message() {
+  json res_empty;
+  try {
+    json res = this->_receive();
+    return res;
+  } catch (EOFError) {
+    return res_empty;
+  }
+
+  return res_empty;
+}
+
 int JSONRPC2Connection::_read_header_content_length(std::string line) {
   if (line.size() < 2 || (line[line.size() - 1] == '\n' && line[line.size() - 2] == '\r'))  {
     throw JSONRPC2ProtocolError("Line endings must be \r\n");
@@ -40,31 +57,25 @@ int JSONRPC2Connection::_read_header_content_length(std::string line) {
   return -1;
 }
 
-std::string JSONRPC2Connection::read(int len) {
-  std::cin >> std::noskipws;
-
+std::string JSONRPC2Connection::read(int length) {
   std::string body = "";
   int exit_seq = 0;
-  for (int i = 0; i < len;) {
+  int idx = 0;
+  while (idx < length) {
     int c = getchar();
     if (c == EOF) break;
-    if (i == 0 && c != 123) continue;
-    if (exit_seq == 0 && c == '\r') {
+    if (idx == 0 && c != 123) continue;
+    if (exit_seq == 0 && c == '\r')
       ++exit_seq;
-    } else if (exit_seq == 0 && c == '\n'){
+    else if (exit_seq == 0 && c == '\n')
       break;
-    } else {
+    else {
       body += c;
-      i++;
+      idx++;
     }
   }
   this->log.log("Readed body as: " + body + '\n');
   return body;
-}
-
-json JSONRPC2Connection::_json_parse(std::string body) {
-  auto json_body = json::parse(body);
-  return json_body;
 }
 
 json JSONRPC2Connection::_receive() {
@@ -75,6 +86,7 @@ json JSONRPC2Connection::_receive() {
     this->log.log("Throwing EOF Error: ");
     throw(EOFError());
   }
+  this->log.log("Line : "+ line);
   int length = this->_read_header_content_length(line);
   std::string body = this->read(length);
   return _json_parse(body);
@@ -97,18 +109,6 @@ void JSONRPC2Connection::write_message(int rid, json& response) {
       {"result", response},
   };
   this->_send(body);
-}
-
-json JSONRPC2Connection::read_message() {
-  json res_empty;
-  try {
-    json res = this->_receive();
-    return res;
-  } catch (EOFError) {
-    return res_empty;
-  }
-
-  return res_empty;
 }
 
 void JSONRPC2Connection::send_notification(std::string method, json &params) {
