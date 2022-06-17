@@ -1,12 +1,14 @@
 #include "LPythonServer.hpp"
-#include "utilities.hpp"
 #include "JSONRPC2Connection.hpp"
+
 #include "nlohmann/json.hpp"
+#include "utilities.hpp"
 
 using json = nlohmann::json;
 
 #include <map>
 #include <string>
+
 
 struct handle_functions
 {
@@ -17,6 +19,7 @@ struct handle_functions
     this->conn = new JSONRPC2Connection();
 
   }
+  
   json serve_initialize(json request) {
     this->log.log("serve_initialized() called");
     json server_capabilities = {
@@ -25,6 +28,7 @@ struct handle_functions
     };
     return {{"capabilities", server_capabilities}};
   }
+
   void serve_onSave(json request) {
         std::string uri = request["params"]["textDocument"]["uri"];
         int start_line = 2;
